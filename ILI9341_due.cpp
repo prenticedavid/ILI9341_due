@@ -1,4 +1,4 @@
-#define USE_ST7789
+//#define USE_ST7789
 
 /*
 ILI9341_due_.cpp - Arduino Due library for interfacing with ILI9341-based TFTs
@@ -276,26 +276,22 @@ void ILI9341_due::setSPIClockDivider(uint8_t divider)
 	_spiClkDivider = divider;
 #ifdef ILI_USE_SPI_TRANSACTION
 #if defined (ARDUINO_SAM_DUE)
-#if defined(USE_ST7789)
-	_spiSettings = SPISettings(F_CPU / divider, MSBFIRST, SPI_MODE3);
-#else
-	_spiSettings = SPISettings(F_CPU / divider, MSBFIRST, SPI_MODE0);
-#endif
+	_spiSettings = SPISettings(F_CPU / divider, MSBFIRST, ILI9341_SPI_MODE);
 #elif defined (ARDUINO_ARCH_AVR)
 #if divider == SPI_CLOCK_DIV2
-	_spiSettings = SPISettings(F_CPU / 2, MSBFIRST, SPI_MODE0);
+	_spiSettings = SPISettings(F_CPU / 2, MSBFIRST, ILI9341_SPI_MODE);
 #elif divider == SPI_CLOCK_DIV4
-	_spiSettings = SPISettings(F_CPU / 4, MSBFIRST, SPI_MODE0);
+	_spiSettings = SPISettings(F_CPU / 4, MSBFIRST, ILI9341_SPI_MODE);
 #elif divider == SPI_CLOCK_DIV8
-	_spiSettings = SPISettings(F_CPU / 8, MSBFIRST, SPI_MODE0);
+	_spiSettings = SPISettings(F_CPU / 8, MSBFIRST, ILI9341_SPI_MODE);
 #elif divider == SPI_CLOCK_DIV16
-	_spiSettings = SPISettings(F_CPU / 16, MSBFIRST, SPI_MODE0);
+	_spiSettings = SPISettings(F_CPU / 16, MSBFIRST, ILI9341_SPI_MODE);
 #elif divider == SPI_CLOCK_DIV32
-	_spiSettings = SPISettings(F_CPU / 32, MSBFIRST, SPI_MODE0);
+	_spiSettings = SPISettings(F_CPU / 32, MSBFIRST, ILI9341_SPI_MODE);
 #elif divider == SPI_CLOCK_DIV64
-	_spiSettings = SPISettings(F_CPU / 64, MSBFIRST, SPI_MODE0);
+	_spiSettings = SPISettings(F_CPU / 64, MSBFIRST, ILI9341_SPI_MODE);
 #elif divider == SPI_CLOCK_DIV128
-	_spiSettings = SPISettings(F_CPU / 128, MSBFIRST, SPI_MODE0);
+	_spiSettings = SPISettings(F_CPU / 128, MSBFIRST, ILI9341_SPI_MODE);
 #endif
 #endif
 #endif
@@ -306,15 +302,24 @@ void ILI9341_due::setSPIClockDivider(uint8_t divider)
 #if SPI_MODE_NORMAL
 	SPI.setClockDivider(divider);
 	SPI.setBitOrder(MSBFIRST);
-	SPI.setDataMode(SPI_MODE0);
+	SPI.setDataMode(ILI9341_SPI_MODE);
 #elif SPI_MODE_EXTENDED
 	SPI.setClockDivider(_cs, divider);
 	SPI.setBitOrder(_cs, MSBFIRST);
-	SPI.setDataMode(_cs, SPI_MODE0);
+	SPI.setDataMode(_cs, ILI9341_SPI_MODE);
 #endif
 #endif
 
 #if SPI_MODE_DMA
+#if ILI9341_SPI_MODE == SPI_MODE0
+    _spi_Mode_bm = 2;  //SPI_CSR_NCPHA
+#elif ILI9341_SPI_MODE == SPI_MODE1
+    _spi_Mode_bm = 0;
+#elif ILI9341_SPI_MODE == SPI_MODE2
+    _spi_Mode_bm = 3;
+#elif ILI9341_SPI_MODE == SPI_MODE3
+    _spi_Mode_bm = 1;  //SPI_CSR_CPOL
+#endif    
 	dmaInit(divider);
 #endif
 }
