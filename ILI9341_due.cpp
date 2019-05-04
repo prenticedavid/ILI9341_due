@@ -1,4 +1,4 @@
-//#define USE_ST7789
+#define USE_ST7789
 
 /*
 ILI9341_due_.cpp - Arduino Due library for interfacing with ILI9341-based TFTs

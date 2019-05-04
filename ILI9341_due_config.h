@@ -12,8 +12,8 @@ Copyright (c) 2015  Marek Buriak
 #define _ILI9341_due_configH_
 
 // comment out the SPI mode you want to use (does not matter for AVR)
-//#define ILI9341_SPI_MODE_NORMAL	// uses SPI library
-#define ILI9341_SPI_MODE_EXTENDED	// uses Extended SPI in Due, make sure you use pin 4, 10 or 52 for CS
+#define ILI9341_SPI_MODE_NORMAL	// uses SPI library
+//#define ILI9341_SPI_MODE_EXTENDED	// uses Extended SPI in Due, make sure you use pin 4, 10 or 52 for CS
 //#define ILI9341_SPI_MODE_DMA		// uses DMA in Due
 
 #define ILI9341_SPI_MODE SPI_MODE3        //.kbv
