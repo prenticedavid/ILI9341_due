@@ -429,6 +429,7 @@ protected:
 #endif
 
 	uint8_t _spiClkDivider;
+    uint8_t _spi_Mode_bm;    //.kbv
 #ifdef ILI_USE_SPI_TRANSACTION
 	SPISettings _spiSettings;
 	uint8_t _transactionId;
@@ -2083,7 +2084,7 @@ protected:
 		// no mode fault detection, set master mode
 		pSpi->SPI_MR = SPI_PCS(ILI_SPI_CHIP_SEL) | SPI_MR_MODFDIS | SPI_MR_MSTR;
 		// mode 0, 8-bit,
-		pSpi->SPI_CSR[ILI_SPI_CHIP_SEL] = SPI_CSR_SCBR(scbr) | SPI_CSR_NCPHA | SPI_CSR_BITS_8_BIT;
+		pSpi->SPI_CSR[ILI_SPI_CHIP_SEL] = SPI_CSR_SCBR(scbr) | _spi_Mode_bm | SPI_CSR_BITS_8_BIT;
 		// enable SPI
 		pSpi->SPI_CR |= SPI_CR_SPIEN;
 	}
@@ -2098,7 +2099,7 @@ protected:
 		// no mode fault detection, set master mode
 		pSpi->SPI_MR = SPI_PCS(ILI_SPI_CHIP_SEL) | SPI_MR_MODFDIS | SPI_MR_MSTR;
 		// mode 0, 16-bit,
-		pSpi->SPI_CSR[ILI_SPI_CHIP_SEL] = SPI_CSR_SCBR(scbr) | SPI_CSR_NCPHA | SPI_CSR_BITS_16_BIT;
+		pSpi->SPI_CSR[ILI_SPI_CHIP_SEL] = SPI_CSR_SCBR(scbr) | _spi_Mode_bm | SPI_CSR_BITS_16_BIT;
 		// enable SPI
 		pSpi->SPI_CR |= SPI_CR_SPIEN;
 	}
@@ -2247,13 +2248,13 @@ protected:
 
 	void dmaSend(const uint16_t* buf, uint32_t n) {
 		Spi* pSpi = SPI0;
-		pSpi->SPI_CSR[ILI_SPI_CHIP_SEL] = SPI_CSR_SCBR(_spiClkDivider) | SPI_CSR_NCPHA | SPI_CSR_BITS_16_BIT;
+		pSpi->SPI_CSR[ILI_SPI_CHIP_SEL] = SPI_CSR_SCBR(_spiClkDivider) | _spi_Mode_bm | SPI_CSR_BITS_16_BIT;
 		spiDmaTX16(buf, n);
 		while (!dmac_channel_transfer_done(ILI_SPI_DMAC_TX_CH)) {}
 		while ((pSpi->SPI_SR & SPI_SR_TXEMPTY) == 0) {}
 		// leave RDR empty
 		pSpi->SPI_RDR;
-		pSpi->SPI_CSR[ILI_SPI_CHIP_SEL] = SPI_CSR_SCBR(_spiClkDivider) | SPI_CSR_NCPHA | SPI_CSR_BITS_8_BIT;
+		pSpi->SPI_CSR[ILI_SPI_CHIP_SEL] = SPI_CSR_SCBR(_spiClkDivider) | _spi_Mode_bm | SPI_CSR_BITS_8_BIT;
 	}
 #endif
 #endif
