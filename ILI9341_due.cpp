@@ -1,3 +1,5 @@
+#define USE_ST7789
+
 /*
 ILI9341_due_.cpp - Arduino Due library for interfacing with ILI9341-based TFTs
 
@@ -51,6 +53,30 @@ MIT license, all text above must be included in any redistribution.
 #pragma GCC diagnostic ignored "-Wattributes"
 #pragma GCC diagnostic ignored "-Wswitch"
 
+#if defined(USE_ST7789)
+#undef ILI9341_TFTHEIGHT
+#define ILI9341_TFTHEIGHT 240
+#define INIT_COMMANDS ST7789_init_commands
+#else
+#define INIT_COMMANDS init_commands
+#endif
+
+static const uint8_t ST7789_init_commands[] PROGMEM = {
+    6, (0xB2), 0x0C, 0x0C, 0x00, 0x33, 0x33,    //PORCTRK: Porch setting [08 08 00 22 22] PSEN=0 anyway
+    2, (0xB7), 0x35,            //GCTRL: Gate Control [35]
+    2, (0xBB), 0x2B,            //VCOMS: VCOM setting VCOM=1.175 [20] VCOM=0.9
+    2, (0xC0), 0x10,            //LCMCTRL: LCM Control [2C] was=14
+//    4, (0xE4), 0x27, 0x00, 0x10, //GATE CTRL: NL=320/8-1 = 39, SCN=0, SM=0, GS=0
+    3, (0xC2), 0x01, 0xFF,      //VDVVRHEN: VDV and VRH Command Enable [01 FF]
+    2, (0xC3), 0x11,            //VRHS: VRH Set VAP=4.4, VAN=-4.4 [0B]
+    2, (0xC4), 0x20,            //VDVS: VDV Set [20]
+    2, (0xC6), 0x0F,            //FRCTRL2: Frame Rate control in normal mode [0F]
+    3, (0xD0), 0xA4, 0xA1,      //PWCTRL1: Power Control 1 [A4 A1]
+    //    15, (0xE0), 0xD0, 0x00, 0x05, 0x0E, 0x15, 0x0D, 0x37, 0x43, 0x47, 0x09, 0x15, 0x12, 0x16, 0x19,     //PVGAMCTRL: Positive Voltage Gamma control
+    //    15, (0xE1), 0xD0, 0x00, 0x05, 0x0D, 0x0C, 0x06, 0x2D, 0x44, 0x40, 0x0E, 0x1C, 0x18, 0x16, 0x19,     //NVGAMCTRL: Negative Voltage Gamma control
+	2, (0x3A), 0x55,
+    0
+};
 
 static const uint8_t init_commands[] PROGMEM = {
 	4, 0xEF, 0x03, 0x80, 0x02,
@@ -146,7 +172,7 @@ bool ILI9341_due::begin(void)
 			delay(150);
 		}
 
-		const uint8_t *addr = init_commands;
+		const uint8_t *addr = INIT_COMMANDS;
 		while (1) {
 			uint8_t count = pgm_read_byte(addr++);
 			if (count-- == 0) break;
@@ -250,7 +276,11 @@ void ILI9341_due::setSPIClockDivider(uint8_t divider)
 	_spiClkDivider = divider;
 #ifdef ILI_USE_SPI_TRANSACTION
 #if defined (ARDUINO_SAM_DUE)
+#if defined(USE_ST7789)
+	_spiSettings = SPISettings(F_CPU / divider, MSBFIRST, SPI_MODE3);
+#else
 	_spiSettings = SPISettings(F_CPU / divider, MSBFIRST, SPI_MODE0);
+#endif
 #elif defined (ARDUINO_ARCH_AVR)
 #if divider == SPI_CLOCK_DIV2
 	_spiSettings = SPISettings(F_CPU / 2, MSBFIRST, SPI_MODE0);
