@@ -12,19 +12,19 @@ Copyright (c) 2015  Marek Buriak
 #define _ILI9341_due_configH_
 
 // comment out the SPI mode you want to use (does not matter for AVR)
-//#define ILI9341_SPI_MODE_NORMAL	// uses SPI library
+#define ILI9341_SPI_MODE_NORMAL	// uses SPI library
 //#define ILI9341_SPI_MODE_EXTENDED	// uses Extended SPI in Due, make sure you use pin 4, 10 or 52 for CS
-#define ILI9341_SPI_MODE_DMA		// uses DMA in Due
+//#define ILI9341_SPI_MODE_DMA		// uses DMA in Due
 
 // set the clock divider
 #if defined ARDUINO_SAM_DUE
-#define ILI9341_SPI_CLKDIVIDER 2	// for Due
+#define ILI9341_SPI_CLKDIVIDER 16	// for Due
 #elif defined ARDUINO_ARCH_AVR
 #define ILI9341_SPI_CLKDIVIDER SPI_CLOCK_DIV2	// for Uno, Mega,...
 #endif
 
 // uncomment if you want to use SPI transactions. Uncomment it if the library does not work when used with other libraries.
-//#define ILI_USE_SPI_TRANSACTION
+#define ILI_USE_SPI_TRANSACTION
 
 // comment out if you do need to use scaled text. The text will draw then faster.
 #define TEXT_SCALING_ENABLED
